@@ -1,0 +1,35 @@
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+    min-height: 80vh;
+}
+
+.aboutContent {
+    line-height: 1.6;
+}
+
+.aboutContent section {
+    margin-bottom: 2rem;
+}
+
+.aboutContent h2 {
+    margin: 1.5rem 0 1rem;
+    color: #333;
+    font-size: 1.8rem;
+}
+
+.aboutContent ul {
+    padding-left: 1.5rem;
+    margin: 1rem 0;
+}
+
+.aboutContent li {
+    margin-bottom: 0.5rem;
+}
+
+.container {
+    /* Keep existing styles */
+    padding-bottom: 40px;
+    /* Add space above footer */
+}
