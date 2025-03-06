@@ -1,3 +1,106 @@
+/* src/components/ReleaseCard/ReleaseCard.module.css */
+.basketButton {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    margin-top: 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.basketButton:hover {
+    background: #0056b3;
+}
+
+/* src/pages/Basket/Basket.module.css */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.title {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.empty {
+    text-align: center;
+    font-size: 1.2rem;
+    color: #666;
+}
+
+.items {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.item {
+    display: flex;
+    gap: 2rem;
+    padding: 1rem;
+    border-bottom: 1px solid #eee;
+}
+
+.image {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.details {
+    flex: 1;
+}
+
+.quantityControl {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin: 1rem 0;
+}
+
+.quantityControl button {
+    padding: 5px 10px;
+    border: 1px solid #ddd;
+    background: white;
+    cursor: pointer;
+}
+
+.removeButton {
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.summary {
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 2px solid #eee;
+    text-align: right;
+}
+
+.total {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.checkoutButton {
+    background: #28a745;
+    color: white;
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1.1rem;
+}
+
 .card {
     background: #fff;
     border-radius: 12px;

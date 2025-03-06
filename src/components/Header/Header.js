@@ -1,9 +1,14 @@
+// src/components/Header/Header.js
 import React from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { FaShoppingCart } from 'react-icons/fa';
+import { useBasket } from '../../context/BasketContext';
 import styles from './Header.module.css';
 
-const Header = ({ cartItems }) => {
+const Header = () => {
+    const { basketItems } = useBasket();
+    const itemCount = basketItems.reduce((sum, item) => sum + item.quantity, 0);
+
     return (
         <header className={styles.header}>
             <nav className={styles.nav}>
@@ -12,38 +17,18 @@ const Header = ({ cartItems }) => {
                 </div>
 
                 <div className={styles.links}>
-                    <NavLink
-                        to="/"
-                        className={({ isActive }) =>
-                            isActive ? styles.activeLink : styles.link
-                        }
-                    >
-                        Home
-                    </NavLink>
-                    <NavLink
-                        to="/catalog"
-                        className={({ isActive }) =>
-                            isActive ? styles.activeLink : styles.link
-                        }
-                    >
-                        Catalog
-                    </NavLink>
-                    <NavLink
-                        to="/about"
-                        className={({ isActive }) =>
-                            isActive ? styles.activeLink : styles.link
-                        }
-                    >
-                        About Us
-                    </NavLink>
+                    <NavLink to="/" className={({ isActive }) =>
+                        isActive ? styles.activeLink : styles.link}>Home</NavLink>
+                    <NavLink to="/catalog" className={({ isActive }) =>
+                        isActive ? styles.activeLink : styles.link}>Catalog</NavLink>
+                    <NavLink to="/about" className={({ isActive }) =>
+                        isActive ? styles.activeLink : styles.link}>About</NavLink>
                 </div>
 
                 <div className={styles.cart}>
                     <Link to="/basket" className={styles.cartLink}>
                         <FaShoppingCart className={styles.cartIcon} />
-                        {cartItems.length > 0 && (
-                            <span className={styles.cartCount}>{cartItems.length}</span>
-                        )}
+                        {itemCount > 0 && <span className={styles.cartCount}>{itemCount}</span>}
                     </Link>
                 </div>
             </nav>
