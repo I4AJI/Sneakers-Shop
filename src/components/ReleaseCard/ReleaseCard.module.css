@@ -1,4 +1,4 @@
-/* src/components/ReleaseCard/ReleaseCard.module.css */
+
 .basketButton {
     background: #007bff;
     color: white;
@@ -14,7 +14,6 @@
     background: #0056b3;
 }
 
-/* src/pages/Basket/Basket.module.css */
 .container {
     max-width: 1200px;
     margin: 0 auto;
