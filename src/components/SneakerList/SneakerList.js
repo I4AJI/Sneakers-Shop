@@ -9,13 +9,12 @@ const SneakerList = () => {
     const [error, setError] = useState(null);
     const [refreshTrigger, setRefreshTrigger] = useState(false);
     const [page, setPage] = useState(1);
-    const [limit, setLimit] = useState(9); // Default items per page
+    const [limit, setLimit] = useState(10); 
 
     useEffect(() => {
         const loadData = async () => {
             setLoading(true);
             try {
-                // Adjust the API call to include pagination parameters
                 const response = await fetchSneakers(page, limit);
                 setSneakers(response.data);
                 setError(null);
