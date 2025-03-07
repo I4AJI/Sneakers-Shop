@@ -1,13 +1,13 @@
-/* Merged container styles with additional layout properties */
+
 .container {
     max-width: 1200px;
     margin: 0 auto;
     padding: 2rem 1rem;
     padding-bottom: 40px;
-    /* Keeps existing space above footer */
+  
 }
 
-/* New grid layout for catalog items */
+
 .grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -15,7 +15,7 @@
     margin-bottom: 2rem;
 }
 
-/* Loading state styles */
+
 .loading {
     text-align: center;
     padding: 2rem;
