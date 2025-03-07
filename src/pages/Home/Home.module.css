@@ -38,9 +38,8 @@
 }
 
 .container {
-    /* Keep existing styles */
     padding-bottom: 40px;
-    /* Add space above footer */
+   
 }
 
 .hero {
@@ -61,7 +60,7 @@
 }
 
 .title {
-    /* Merged styles */
+
     text-align: center;
     margin-bottom: 2rem;
     color: #ffffff;
