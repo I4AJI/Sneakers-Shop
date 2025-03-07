@@ -4,6 +4,5 @@ const handleSubmit = async (formData) => {
         // Refresh list after successful POST
         setRefreshTrigger(prev => !prev);
     } catch (err) {
-        // Handle error
     }
 };
