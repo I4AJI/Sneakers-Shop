@@ -1,4 +1,4 @@
-// src/pages/Basket/Basket.js
+
 import React from 'react';
 import { useBasket } from '../../context/BasketContext';
 import styles from './Basket.module.css';
