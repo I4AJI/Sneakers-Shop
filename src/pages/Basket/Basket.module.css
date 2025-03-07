@@ -6,7 +6,5 @@
 }
 
 .container {
-    /* Keep existing styles */
-    padding-bottom: 40px;
-    /* Add space above footer */
+   padding-bottom: 40px;
 }
