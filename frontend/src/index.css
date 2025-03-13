@@ -1,0 +1,174 @@
+/* Основные стили */
+main {
+  min-height: 80vh;
+}
+
+h1 {
+  font-size: 1.8rem;
+  padding: 1rem 0;
+}
+
+h2 {
+  font-size: 1.4rem;
+  padding: 0.5rem 0;
+}
+
+/* Стили для рейтинга */
+.rating span {
+  margin: 0.1rem;
+}
+
+/* Стили для карточек товаров */
+.product-card-image {
+  height: 200px;
+  object-fit: contain;
+}
+
+/* Стили для страницы товара */
+.product-detail-image {
+  max-height: 500px;
+  object-fit: contain;
+}
+
+/* Стили для корзины */
+.cart-image {
+  max-width: 100px;
+  max-height: 100px;
+  object-fit: contain;
+}
+
+
+/* Анимации при наведении на карточки товаров */
+.card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Анимация для изображений товаров при наведении */
+.product-card-image {
+  height: 200px;
+  object-fit: contain;
+  transition: transform 0.5s ease;
+}
+
+.card:hover .product-card-image {
+  transform: scale(1.05);
+}
+
+/* Анимация для кнопок */
+.btn {
+  transition: all 0.3s ease;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+}
+
+.btn:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+/* Более стильная кнопка "Add to Cart" */
+.btn-block {
+  background: linear-gradient(45deg, #2980b9, #3498db);
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.btn-block:hover {
+  background: linear-gradient(45deg, #3498db, #2980b9);
+}
+
+/* Стилизация при выборе размеров и цветов */
+.form-select {
+  cursor: pointer;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-select:hover {
+  border-color: #3498db;
+}
+
+.form-select:focus {
+  box-shadow: 0 0 0 0.25rem rgba(52, 152, 219, 0.25);
+}
+
+/* Анимация для кнопки удаления */
+.btn-light {
+  transition: all 0.3s ease;
+}
+
+.btn-light:hover {
+  color: #dc3545;
+  transform: rotate(5deg);
+}
+
+/* Улучшенные стили для навигации */
+.navbar {
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.navbar-brand,
+.nav-link {
+  transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.navbar-brand:hover,
+.nav-link:hover {
+  color: #3498db !important;
+  transform: translateY(-2px);
+}
+
+/* Подсветка при наведении на элементы списка */
+.list-group-item {
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.list-group-item:hover {
+  background-color: rgba(52, 152, 219, 0.05);
+}
+
+/* Анимация для рейтинга звезд */
+.rating span {
+  margin: 0.1rem;
+  transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.rating:hover span {
+  color: #f39c12;
+}
+
+.rating:hover span:hover {
+  transform: scale(1.3);
+}
+
+
+/* Добавьте эти стили в ваш index.css */
+.product-image-container {
+  position: relative;
+  width: 100%;
+  height: 0;
+  padding-bottom: 100%;
+  /* Создает квадратный контейнер */
+  overflow: hidden;
+  background-color: #f8f9fa;
+  /* Цвет фона до загрузки изображения */
+}
+
+.product-card-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transition: transform 0.5s ease;
+  padding: 10px;
+}
