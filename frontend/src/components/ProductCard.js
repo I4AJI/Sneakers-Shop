@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { Card } from 'react-bootstrap';
 import { motion } from 'framer-motion';
@@ -6,6 +6,13 @@ import Rating from './Rating';
 
 const ProductCard = ({ product, index }) => {
   const [imageLoaded, setImageLoaded] = useState(false);
+  const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5001';
+  
+  // Преобразование пути к изображению
+  const getImageUrl = (imagePath) => {
+    if (!imagePath) return 'https://via.placeholder.com/300?text=No+Image';
+    return imagePath.startsWith('/') ? `${apiUrl}${imagePath}` : imagePath;
+  };
 
   return (
     <motion.div
@@ -24,13 +31,17 @@ const ProductCard = ({ product, index }) => {
                 </div>
               </div>
             )}
-            <Card.Img
-              src={product.image}
-              variant="top"
-              className="product-card-image"
+            <Card.Img 
+              src={getImageUrl(product.image)} 
+              variant="top" 
+              className="product-card-image" 
               style={{ opacity: imageLoaded ? 1 : 0 }}
               onLoad={() => setImageLoaded(true)}
               loading="lazy"
+              onError={(e) => { 
+                e.target.onerror = null; 
+                e.target.src = 'https://via.placeholder.com/300?text=Image+Error'; 
+              }}
             />
           </div>
         </Link>
@@ -43,9 +54,9 @@ const ProductCard = ({ product, index }) => {
           </Link>
 
           <Card.Text as="div">
-            <Rating
-              value={product.rating || 0}
-              text={`${product.numReviews || 0} reviews`}
+            <Rating 
+              value={product.rating || 0} 
+              text={`${product.numReviews || 0} reviews`} 
             />
           </Card.Text>
 
