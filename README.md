@@ -166,6 +166,6 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## Contact
 
-Your Name - [your.email@example.com](mailto:your.email@example.com)
+email: maxbritish4@gmail.com
 
 Project Link: [https://github.com/yourusername/sneaker-shop](https://github.com/yourusername/sneaker-shop)
