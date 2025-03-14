@@ -1,4 +1,3 @@
-import React, { useState, useEffect } from 'react';
 import { Row, Col } from 'react-bootstrap';
 import ProductCard from '../components/ProductCard';
 import axios from 'axios';
@@ -11,10 +10,13 @@ const HomePage = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const { data } = await axios.get('/api/products');
+        // Используем полный URL бэкенда или переменную окружения
+        const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5001';
+        const { data } = await axios.get(`${apiUrl}/api/products`);
         setProducts(data);
         setLoading(false);
       } catch (error) {
+        console.error('Error fetching products:', error);
         setError('Failed to load products');
         setLoading(false);
       }
