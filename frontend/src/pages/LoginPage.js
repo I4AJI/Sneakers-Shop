@@ -1,3 +1,4 @@
+// src/pages/LoginPage.js
 import React, { useState } from 'react';
 import { Form, Button, Container, Row, Col, Alert } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
@@ -8,13 +9,19 @@ const LoginPage = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  
+  // API URL
+  const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5001';
 
   const submitHandler = async (e) => {
     e.preventDefault();
     setError('');
 
     try {
-      const { data } = await axios.post('/api/users/login', { email, password });
+      // Используем полный URL для запроса
+      const { data } = await axios.post(`${apiUrl}/api/users/login`, { email, password });
+      
+      console.log('Login response:', data); // Для отладки
       
       // Сохраняем данные пользователя и токен
       localStorage.setItem('userInfo', JSON.stringify(data));
@@ -27,6 +34,7 @@ const LoginPage = () => {
         navigate('/');
       }
     } catch (error) {
+      console.error('Login error:', error); // Для отладки
       setError(
         error.response && error.response.data.message
           ? error.response.data.message
