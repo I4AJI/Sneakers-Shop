@@ -1,4 +1,4 @@
-// src/pages/AdminProductPage.js - обновленная версия
+// src/pages/AdminProductPage.js
 import React, { useState, useEffect } from 'react';
 import { Form, Button, Container, Row, Col, Card, Alert } from 'react-bootstrap';
 import axios from 'axios';
@@ -19,44 +19,60 @@ const AdminProductPage = () => {
   const [isEdit, setIsEdit] = useState(false);
   const [editId, setEditId] = useState(null);
   const [uploading, setUploading] = useState(false);
+  const [debug, setDebug] = useState(''); // For debugging information
   const navigate = useNavigate();
 
   // API URL
   const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5001';
 
-  // Получаем токен из localStorage
-  const token = localStorage.getItem('token');
-
-  // Проверяем авторизацию при монтировании
+  // Check authentication on every render
   useEffect(() => {
-    if (!token) {
-      navigate('/login');
-    }
-  }, [token, navigate]);
+    const userInfo = localStorage.getItem('userInfo') ? JSON.parse(localStorage.getItem('userInfo')) : null;
+    const token = localStorage.getItem('token');
 
-  // Получение данных о товарах
+    if (!userInfo || !token) {
+      setDebug('No user info or token found, redirecting to login...');
+      navigate('/login');
+      return;
+    }
+
+    if (!userInfo.isAdmin) {
+      setDebug('User is not admin, redirecting to home...');
+      navigate('/');
+      return;
+    }
+
+    setDebug(`User authenticated as admin: ${userInfo.name}`);
+  }, [navigate]);
+
+  // Fetch products on component mount
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        console.log('Fetching products from:', `${apiUrl}/api/products`);
+        setDebug(`Fetching products from: ${apiUrl}/api/products`);
         const { data } = await axios.get(`${apiUrl}/api/products`);
-        console.log('Products fetched:', data);
+        setDebug(`Products fetched: ${data.length} items`);
         setProducts(data);
       } catch (error) {
-        console.error('Error fetching products', error);
-        setError('Failed to load products');
+        console.error('Error fetching products:', error);
+        setDebug(`Error fetching products: ${error.message}`);
+        setError(`Failed to load products: ${error.message}`);
       }
     };
+
     fetchProducts();
   }, [apiUrl]);
 
-  // Обработчик для загрузки изображения
-  const uploadFileHandler = async (e) => {
+  // File upload handler
+  const uploadFileHandler = (e) => {
     const file = e.target.files[0];
-    setImage(file);
+    if (file) {
+      setDebug(`File selected: ${file.name}, size: ${file.size} bytes, type: ${file.type}`);
+      setImage(file);
+    }
   };
 
-  // Обработчик для сброса формы
+  // Form reset handler
   const resetForm = () => {
     setName('');
     setBrand('');
@@ -68,101 +84,152 @@ const AdminProductPage = () => {
     setCountInStock(0);
     setIsEdit(false);
     setEditId(null);
+    setDebug('Form reset');
   };
 
-  // Обработчик для редактирования товара
+  // Edit product handler
   const handleEdit = (product) => {
     setName(product.name);
     setBrand(product.brand);
     setDescription(product.description);
     setPrice(product.price);
-    setSizes(product.sizes.join(', '));
-    setColors(product.colors.join(', '));
+    setSizes(Array.isArray(product.sizes) ? product.sizes.join(', ') : '');
+    setColors(Array.isArray(product.colors) ? product.colors.join(', ') : '');
     setCountInStock(product.countInStock);
     setIsEdit(true);
     setEditId(product._id);
+    setDebug(`Editing product: ${product.name} (ID: ${product._id})`);
   };
 
-  // Обработчик для удаления товара
+  // Delete product handler
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this product?')) {
       try {
+        const token = localStorage.getItem('token');
+        setDebug(`Deleting product ID: ${id}, Token: ${token ? 'Present' : 'Missing'}`);
+        
         await axios.delete(`${apiUrl}/api/products/${id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
-          },
+            'Content-Type': 'application/json'
+          }
         });
+        
         setProducts(products.filter((p) => p._id !== id));
         setMessage('Product deleted successfully');
+        setDebug('Product deleted successfully');
       } catch (error) {
-        console.error('Error deleting product', error);
-        setError('Failed to delete product');
+        console.error('Error deleting product:', error);
+        setDebug(`Error deleting product: ${error.response?.data?.message || error.message}`);
+        setError(`Failed to delete product: ${error.response?.data?.message || error.message}`);
       }
     }
   };
 
-  // Обработчик отправки формы
+  // Form submission handler
   const submitHandler = async (e) => {
     e.preventDefault();
     setError('');
     setMessage('');
+    setDebug('');
 
-    const formData = new FormData();
-    formData.append('name', name);
-    formData.append('brand', brand);
-    formData.append('description', description);
-    formData.append('price', price);
-    formData.append('sizes', sizes);
-    formData.append('colors', colors);
-    formData.append('countInStock', countInStock);
-    if (image) {
-      formData.append('image', image);
+    const token = localStorage.getItem('token');
+    if (!token) {
+      setError('Authentication token missing. Please log in again.');
+      setDebug('Token missing during form submission');
+      return;
     }
 
     try {
       setUploading(true);
-      console.log('Token:', token);
+      
+      // Create form data
+      const formData = new FormData();
+      formData.append('name', name);
+      formData.append('brand', brand);
+      formData.append('description', description);
+      formData.append('price', price);
+      formData.append('sizes', sizes);
+      formData.append('colors', colors);
+      formData.append('countInStock', countInStock);
+      
+      if (image) {
+        formData.append('image', image);
+        setDebug(`Adding image to form: ${image.name}`);
+      } else if (isEdit) {
+        setDebug('No new image selected for edit');
+      } else {
+        setDebug('No image selected for new product');
+      }
+
+      // Log form data entries for debugging
+      for (let [key, value] of formData.entries()) {
+        if (key !== 'image') {
+          setDebug(prev => `${prev}\nForm data - ${key}: ${value}`);
+        } else {
+          setDebug(prev => `${prev}\nForm data - image: [File object]`);
+        }
+      }
 
       if (isEdit) {
-        // Обновляем существующий товар
-        console.log(`Updating product at: ${apiUrl}/api/products/${editId}`);
-        const { data } = await axios.put(`${apiUrl}/api/products/${editId}`, formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        console.log('Product updated:', data);
+        // Update existing product
+        setDebug(`Updating product at: ${apiUrl}/api/products/${editId}`);
+        
+        const { data } = await axios.put(
+          `${apiUrl}/api/products/${editId}`, 
+          formData, 
+          {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+              'Authorization': `Bearer ${token}`
+            }
+          }
+        );
+        
+        setDebug(`Product updated successfully: ${data._id}`);
         setProducts(products.map((p) => (p._id === editId ? data : p)));
         setMessage('Product updated successfully');
       } else {
-        // Создаем новый товар
-        console.log(`Creating product at: ${apiUrl}/api/products`);
-        const { data } = await axios.post(`${apiUrl}/api/products`, formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        console.log('Product created:', data);
+        // Create new product
+        setDebug(`Creating product at: ${apiUrl}/api/products`);
+        
+        const { data } = await axios.post(
+          `${apiUrl}/api/products`, 
+          formData, 
+          {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+              'Authorization': `Bearer ${token}`
+            }
+          }
+        );
+        
+        setDebug(`Product created successfully: ${data._id}`);
         setProducts([...products, data]);
         setMessage('Product created successfully');
       }
 
+      // Reset form after successful submission
       resetForm();
+      
     } catch (error) {
-      console.error('Error saving product', error);
-      if (error.response && error.response.data && error.response.data.message) {
-        setError(`Failed to save product: ${error.response.data.message}`);
-      } else {
-        setError('Failed to save product. Please check your connection and try again.');
+      console.error('Error saving product:', error);
+      
+      const errorMsg = error.response?.data?.message || error.message || 'Unknown error';
+      setDebug(`Error saving product: ${errorMsg}`);
+      setError(`Failed to save product: ${errorMsg}`);
+      
+      // More detailed error logging
+      if (error.response) {
+        setDebug(`Response status: ${error.response.status}`);
+        setDebug(`Response data: ${JSON.stringify(error.response.data)}`);
       }
     } finally {
       setUploading(false);
     }
   };
 
-  // Преобразование пути к изображению
+  // Helper function to get image URL
   const getImageUrl = (imagePath) => {
     if (!imagePath) return 'https://via.placeholder.com/200?text=No+Image';
     return imagePath.startsWith('/') ? `${apiUrl}${imagePath}` : imagePath;
@@ -175,6 +242,13 @@ const AdminProductPage = () => {
           <h2>{isEdit ? 'Edit Product' : 'Add New Product'}</h2>
           {message && <Alert variant="success">{message}</Alert>}
           {error && <Alert variant="danger">{error}</Alert>}
+          {debug && (
+            <div className="mb-3 p-2 bg-light" style={{ whiteSpace: 'pre-wrap', fontSize: '12px' }}>
+              <strong>Debug Info:</strong><br />
+              {debug}
+            </div>
+          )}
+          
           <Form onSubmit={submitHandler}>
             <Form.Group className="mb-3">
               <Form.Label>Name</Form.Label>
@@ -214,6 +288,7 @@ const AdminProductPage = () => {
               <Form.Label>Price</Form.Label>
               <Form.Control
                 type="number"
+                step="0.01"
                 placeholder="Enter price"
                 value={price}
                 onChange={(e) => setPrice(e.target.value)}
@@ -248,8 +323,9 @@ const AdminProductPage = () => {
               <Form.Control
                 type="file"
                 onChange={uploadFileHandler}
+                accept="image/*"
               />
-              {uploading && <p>Uploading...</p>}
+              {uploading && <div className="mt-2">Uploading...</div>}
             </Form.Group>
 
             <Form.Group className="mb-3">
