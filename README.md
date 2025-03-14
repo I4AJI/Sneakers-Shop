@@ -43,7 +43,7 @@ SneakerShop is a modern e-commerce platform for selling sneakers, built using th
 ### Backend Setup
 1. Clone the repository
 ```bash
-git clone https://github.com/yourusername/sneaker-shop.git
+git clone https://github.com/I4AJI/Sneakers-Shop.git
 cd sneaker-shop/backend
 ```
 
