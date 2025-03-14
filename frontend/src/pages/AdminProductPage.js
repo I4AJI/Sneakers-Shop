@@ -1,7 +1,8 @@
+// src/pages/AdminProductPage.js - обновленная версия
 import React, { useState, useEffect } from 'react';
 import { Form, Button, Container, Row, Col, Card, Alert } from 'react-bootstrap';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const AdminProductPage = () => {
   const [products, setProducts] = useState([]);
@@ -18,22 +19,36 @@ const AdminProductPage = () => {
   const [isEdit, setIsEdit] = useState(false);
   const [editId, setEditId] = useState(null);
   const [uploading, setUploading] = useState(false);
+  const navigate = useNavigate();
+
+  // API URL
+  const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5001';
+
+  // Получаем токен из localStorage
+  const token = localStorage.getItem('token');
+
+  // Проверяем авторизацию при монтировании
+  useEffect(() => {
+    if (!token) {
+      navigate('/login');
+    }
+  }, [token, navigate]);
 
   // Получение данных о товарах
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const { data } = await axios.get('/api/products');
+        console.log('Fetching products from:', `${apiUrl}/api/products`);
+        const { data } = await axios.get(`${apiUrl}/api/products`);
+        console.log('Products fetched:', data);
         setProducts(data);
       } catch (error) {
         console.error('Error fetching products', error);
+        setError('Failed to load products');
       }
     };
     fetchProducts();
-  }, []);
-
-  // Получение токена авторизации (например, из localStorage)
-  const token = localStorage.getItem('token');
+  }, [apiUrl]);
 
   // Обработчик для загрузки изображения
   const uploadFileHandler = async (e) => {
@@ -72,7 +87,7 @@ const AdminProductPage = () => {
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this product?')) {
       try {
-        await axios.delete(`/api/products/${id}`, {
+        await axios.delete(`${apiUrl}/api/products/${id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -80,8 +95,8 @@ const AdminProductPage = () => {
         setProducts(products.filter((p) => p._id !== id));
         setMessage('Product deleted successfully');
       } catch (error) {
-        setError('Failed to delete product');
         console.error('Error deleting product', error);
+        setError('Failed to delete product');
       }
     }
   };
@@ -106,36 +121,51 @@ const AdminProductPage = () => {
 
     try {
       setUploading(true);
+      console.log('Token:', token);
 
       if (isEdit) {
         // Обновляем существующий товар
-        const { data } = await axios.put(`/api/products/${editId}`, formData, {
+        console.log(`Updating product at: ${apiUrl}/api/products/${editId}`);
+        const { data } = await axios.put(`${apiUrl}/api/products/${editId}`, formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
             Authorization: `Bearer ${token}`,
           },
         });
+        console.log('Product updated:', data);
         setProducts(products.map((p) => (p._id === editId ? data : p)));
         setMessage('Product updated successfully');
       } else {
         // Создаем новый товар
-        const { data } = await axios.post('/api/products', formData, {
+        console.log(`Creating product at: ${apiUrl}/api/products`);
+        const { data } = await axios.post(`${apiUrl}/api/products`, formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
             Authorization: `Bearer ${token}`,
           },
         });
+        console.log('Product created:', data);
         setProducts([...products, data]);
         setMessage('Product created successfully');
       }
 
       resetForm();
     } catch (error) {
-      setError('Failed to save product');
       console.error('Error saving product', error);
+      if (error.response && error.response.data && error.response.data.message) {
+        setError(`Failed to save product: ${error.response.data.message}`);
+      } else {
+        setError('Failed to save product. Please check your connection and try again.');
+      }
     } finally {
       setUploading(false);
     }
+  };
+
+  // Преобразование пути к изображению
+  const getImageUrl = (imagePath) => {
+    if (!imagePath) return 'https://via.placeholder.com/200?text=No+Image';
+    return imagePath.startsWith('/') ? `${apiUrl}${imagePath}` : imagePath;
   };
 
   return (
@@ -252,41 +282,49 @@ const AdminProductPage = () => {
       <Row className="mt-5">
         <Col md={12}>
           <h2>Products</h2>
-          <Row>
-            {products.map((product) => (
-              <Col key={product._id} sm={12} md={6} lg={4} xl={3}>
-                <Card className="my-3 p-3 rounded">
-                  <Link to={`/product/${product._id}`}>
-                    <Card.Img
-                      src={product.image}
-                      variant="top"
-                      style={{ height: '200px', objectFit: 'contain' }}
-                    />
-                  </Link>
-                  <Card.Body>
-                    <Card.Title as="div">
-                      <strong>{product.name}</strong>
-                    </Card.Title>
-                    <Card.Text as="h3">${product.price}</Card.Text>
-                    <Button
-                      variant="info"
-                      className="btn-sm me-2"
-                      onClick={() => handleEdit(product)}
-                    >
-                      Edit
-                    </Button>
-                    <Button
-                      variant="danger"
-                      className="btn-sm"
-                      onClick={() => handleDelete(product._id)}
-                    >
-                      Delete
-                    </Button>
-                  </Card.Body>
-                </Card>
-              </Col>
-            ))}
-          </Row>
+          {products.length === 0 ? (
+            <Alert variant="info">No products found. Add your first product above!</Alert>
+          ) : (
+            <Row>
+              {products.map((product) => (
+                <Col key={product._id} sm={12} md={6} lg={4} xl={3}>
+                  <Card className="my-3 p-3 rounded">
+                    <Link to={`/product/${product._id}`}>
+                      <Card.Img
+                        src={getImageUrl(product.image)}
+                        variant="top"
+                        style={{ height: '200px', objectFit: 'contain' }}
+                        onError={(e) => { 
+                          e.target.onerror = null; 
+                          e.target.src = 'https://via.placeholder.com/200?text=Image+Error'; 
+                        }}
+                      />
+                    </Link>
+                    <Card.Body>
+                      <Card.Title as="div">
+                        <strong>{product.name}</strong>
+                      </Card.Title>
+                      <Card.Text as="h3">${product.price}</Card.Text>
+                      <Button
+                        variant="info"
+                        className="btn-sm me-2"
+                        onClick={() => handleEdit(product)}
+                      >
+                        Edit
+                      </Button>
+                      <Button
+                        variant="danger"
+                        className="btn-sm"
+                        onClick={() => handleDelete(product._id)}
+                      >
+                        Delete
+                      </Button>
+                    </Card.Body>
+                  </Card>
+                </Col>
+              ))}
+            </Row>
+          )}
         </Col>
       </Row>
     </Container>
