@@ -15,11 +15,15 @@ const ProductPage = () => {
 
   const { id } = useParams();
   const navigate = useNavigate();
+  
+  // API URL
+  const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5001';
 
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const { data } = await axios.get(`/api/products/${id}`);
+        // Используем полный URL с бэкенда
+        const { data } = await axios.get(`${apiUrl}/api/products/${id}`);
         setProduct(data);
         setLoading(false);
         // Set default selections
@@ -30,17 +34,27 @@ const ProductPage = () => {
           setSelectedColor(data.colors[0]);
         }
       } catch (error) {
+        console.error('Error fetching product:', error);
         setError('Product not found');
         setLoading(false);
       }
     };
 
     fetchProduct();
-  }, [id]);
+  }, [id, apiUrl]);
 
   const addToCartHandler = () => {
     navigate(`/cart/${id}?qty=${qty}&size=${selectedSize}&color=${selectedColor}`);
   };
+  
+  // Преобразование пути к изображению
+  const getImageUrl = (imagePath) => {
+    if (!imagePath) return 'https://via.placeholder.com/500?text=No+Image';
+    return imagePath.startsWith('/') ? `${apiUrl}${imagePath}` : imagePath;
+  };
+  
+  // Плейсхолдер на случай ошибки
+  const fallbackImage = 'https://via.placeholder.com/500?text=Image+Not+Available';
 
   if (loading) {
     return <div>Loading...</div>;
@@ -58,11 +72,12 @@ const ProductPage = () => {
       <Row>
         <Col md={6}>
           <Image 
-            src={product.image} 
+            src={getImageUrl(product.image)} 
             alt={product.name} 
             fluid 
             className="product-detail-image"
             style={{ maxHeight: '500px', objectFit: 'contain' }}
+            onError={(e) => { e.target.src = fallbackImage; }}
           />
         </Col>
         <Col md={3}>
