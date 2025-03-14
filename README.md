@@ -1,4 +1,4 @@
-# SneakerShop - E-commerce Platform
+# SneakerShop
 
 SneakerShop is a modern e-commerce platform for selling sneakers, built using the MERN stack (MongoDB, Express, React, Node.js).
 
@@ -168,4 +168,4 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 email: maxbritish4@gmail.com
 
-Project Link: [https://github.com/yourusername/sneaker-shop](https://github.com/yourusername/sneaker-shop)
+Project Link: https://github.com/I4AJI/Sneakers-Shop.git
