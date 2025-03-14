@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, useLocation, Navigate } from 'react-router-dom';
 import { Container } from 'react-bootstrap';
 import { AnimatePresence, motion } from 'framer-motion';
 import Header from './components/Header';
@@ -10,6 +10,26 @@ import CartPage from './pages/CartPage';
 import LoginPage from './pages/LoginPage';
 import AdminProductPage from './pages/AdminProductPage';
 import ScrollToTop from './components/ScrollToTop';
+
+// Компонент защищенного маршрута
+const PrivateRoute = ({ children, adminOnly = false }) => {
+  const userInfoFromStorage = localStorage.getItem('userInfo')
+    ? JSON.parse(localStorage.getItem('userInfo'))
+    : null;
+
+  // Если пользователь не авторизован, перенаправляем на страницу входа
+  if (!userInfoFromStorage) {
+    return <Navigate to="/login" />;
+  }
+
+  // Если требуются права администратора, но пользователь не админ
+  if (adminOnly && !userInfoFromStorage.isAdmin) {
+    return <Navigate to="/" />;
+  }
+
+  // Иначе показываем защищенный контент
+  return children;
+};
 
 // Компонент обертки для анимаций
 const AnimatedRoutes = () => {
@@ -65,7 +85,9 @@ const AnimatedRoutes = () => {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <AdminProductPage />
+            <PrivateRoute adminOnly={true}>
+              <AdminProductPage />
+            </PrivateRoute>
           </motion.div>
         } />
       </Routes>
