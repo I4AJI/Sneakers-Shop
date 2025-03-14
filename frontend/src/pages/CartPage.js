@@ -10,12 +10,21 @@ const CartPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
+  // API URL
+  const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5001';
+
   // Получение параметров из URL
   const qty = new URLSearchParams(location.search).get('qty') 
     ? Number(new URLSearchParams(location.search).get('qty')) 
     : 1;
   const size = new URLSearchParams(location.search).get('size') || '';
   const color = new URLSearchParams(location.search).get('color') || '';
+
+  // Функция для получения полного URL изображения
+  const getImageUrl = (imagePath) => {
+    if (!imagePath) return 'https://via.placeholder.com/100?text=No+Image';
+    return imagePath.startsWith('/') ? `${apiUrl}${imagePath}` : imagePath;
+  };
 
   useEffect(() => {
     // Получаем текущую корзину из localStorage
@@ -27,7 +36,8 @@ const CartPage = () => {
     if (id) {
       const fetchProductAndAddToCart = async () => {
         try {
-          const { data } = await axios.get(`/api/products/${id}`);
+          // Используем полный URL для API запроса
+          const { data } = await axios.get(`${apiUrl}/api/products/${id}`);
           
           // Проверяем, есть ли уже такой товар в корзине
           const existItem = existingCart.find(
@@ -74,7 +84,7 @@ const CartPage = () => {
       // Просто загружаем существующую корзину
       setCartItems(existingCart);
     }
-  }, [id, qty, size, color, navigate]);
+  }, [id, qty, size, color, navigate, apiUrl]);
 
   // Обработчик удаления товара из корзины
   const removeFromCartHandler = (id, size, color) => {
@@ -124,11 +134,15 @@ const CartPage = () => {
                   <Row>
                     <Col md={2}>
                       <Image 
-                        src={item.image} 
+                        src={getImageUrl(item.image)} 
                         alt={item.name} 
                         fluid 
                         rounded 
                         className="cart-image"
+                        onError={(e) => { 
+                          e.target.onerror = null; 
+                          e.target.src = 'https://via.placeholder.com/100?text=Image+Error'; 
+                        }}
                       />
                     </Col>
                     <Col md={3}>
